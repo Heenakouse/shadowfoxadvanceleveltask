@@ -1,0 +1,70 @@
+ADVANCE LEVEL TASK(task 1)
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Step 1: Load Dataset
+data = pd.DataFrame({
+    "Match No.": [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "Innings": [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "Team": ["Team A"] * 9,
+    "Player Name": ["Player 1", "Player 2", "Player 3", "Player 1", "Player 2", "Player 3", "Player 1", "Player 2", "Player 3"],
+    "Ballcount": [1, 1, 1, 2, 2, 2, 3, 3, 3],
+    "Position": ["Point", "Mid Off", "Square Leg", "Point", "Mid On", "Long On", "Point", "Square Leg", "Long Off"],
+    "Short Description": [
+        "Caught a powerful shot from the batsman",
+        "Fielded a straight drive and threw at the keeper",
+        "Dropped a simple catch off a full toss",
+        "Saved a boundary by diving",
+        "Misfielded a ball leading to an extra run",
+        "Successfully executed a run out",
+        "Made a good pick up and threw to the keeper",
+        "Caught a top edge comfortably",
+        "Fumbled a ball, conceding runs"
+    ],
+    "Pick": ["Catch", "Good Throw", "Drop Catch", "Clean Pick", "Fumble", "Good Throw", "Good Pick", "Catch", "Fumble"],
+    "Throw": ["Run Out", "Missed Stumping", "Missed Run Out", "Run Out", "Stumping", "Run Out", "Missed Run Out", "Run Out", "Missed Stumping"],
+    "Runs": [0, 1, -2, 1, -1, 2, 0, 0, -1],
+    "Overcount": [1, 1, 1, 1, 1, 1, 1, 1, 1],
+    "Venue": ["Stadium A"] * 9
+})
+
+# Step 2: Analyze Individual Player Performance
+def analyze_player_performance(player_name):
+    player_data = data[data['Player Name'] == player_name]
+    total_runs_saved = player_data[player_data['Runs'] > 0]['Runs'].sum()
+    total_runs_conceded = player_data[player_data['Runs'] < 0]['Runs'].sum()
+    catches = player_data[player_data['Pick'] == 'Catch'].shape[0]
+    dropped_catches = player_data[player_data['Pick'] == 'Drop Catch'].shape[0]
+
+    print(f"\n--- Performance Analysis for {player_name} ---")
+    print(f"Total Runs Saved: {total_runs_saved}")
+    print(f"Total Runs Conceded: {total_runs_conceded}")
+    print(f"Total Catches: {catches}")
+    print(f"Total Dropped Catches: {dropped_catches}")
+
+# Step 3: Display Analysis for All Players
+print("Fielding Performance Data:")
+print(data)
+
+players = data['Player Name'].unique()
+for player in players:
+    analyze_player_performance(player)
+
+# Step 4: Visualize Player Performance
+def plot_performance(data):
+    player_summary = data.groupby('Player Name')['Runs'].sum().reset_index()
+    player_summary['Performance'] = player_summary['Runs'].apply(lambda x: "Positive" if x > 0 else "Negative")
+
+    # Create a bar chart
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=player_summary, x='Player Name', y='Runs', hue='Performance', dodge=False, palette={"Positive": "green", "Negative": "red"})
+    plt.title("Total Runs Saved/Conceded by Each Player", fontsize=16)
+    plt.xlabel("Player Name", fontsize=12)
+    plt.ylabel("Runs (Saved/Conceded)", fontsize=12)
+    plt.legend(title="Performance")
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+plot_performance(data)
